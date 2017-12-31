@@ -7,10 +7,16 @@
 import React, { Component } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Actions, Scene, Router } from 'react-native-router-flux';
+
 import HousesList from './sections/houses/HousesList';
+import * as WebServices from './webservices/Webservices'
 
 export default class App extends Component {
-
+  
+  componentWillMount() {
+      WebServices.configureAxios()
+  }
+    
   render() {
 
     return (

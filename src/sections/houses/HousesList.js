@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, Button } from 'react-native';
-import axios from 'axios'
+import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
+import { AsyncCalls, Colors } from '../../commons'
 
 export default class HousesList extends Component {
 
@@ -14,8 +14,8 @@ export default class HousesList extends Component {
     }
 
     componentDidMount() {
-        
-        axios.get("http://146.185.137.85/got/web/casas")
+
+        AsyncCalls.fetchHousesList()
         .then( (response) => {  //Si no uso arrow function y uso un function normal, pierdo el contexto y no puedo usar el this.
             console.log("axios get response: ", response);
             const list = response.data && response.data.records ? response.data.records : []
@@ -26,15 +26,31 @@ export default class HousesList extends Component {
         });
     }
 
+    isCellSelected(item) {
+       
+        if ( this.state.selected && this.state.selected.id == item.id ) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     renderItem(item) {
 
+        const isSelected = this.isCellSelected(item)
+        const cellStyle = isSelected ? {backgroundColor: Colors.red} : { backgroundColor: 'gray'}
+        const titleStyle = isSelected ? { color: 'white'} : { color: 'black'}
+        const buttonTitleColor = isSelected ? 'white' : 'black'
+
         return (
-            <View style={{height: 200, backgroundColor: 'red', marginVertical: 10}}>
-                <Text> {item.nombre} </Text>
+           // <View style={{height: 200, backgroundColor: 'red', marginVertical: 10}}> //Puedo usar inline o con la const styles declarada abajo
+           <View style = {[styles.cell, cellStyle]}>
+                <Text style={titleStyle}> {item.nombre} </Text>
 
                 <Button
                     title={'Select House'}
                     onPress={() => this.setState({ selected: item})}
+                    color= {buttonTitleColor}
                 />
             </View>
         )
@@ -46,12 +62,26 @@ export default class HousesList extends Component {
 
         return (
             <View>
-                <Text> {"Selected House: " + nombre} </Text>
+                <Text style={styles.title}> {"Selected House: " + nombre} </Text>
                 <FlatList
                     data={this.state.list} //Pide array de data
-                    renderItem={ ({item, index}) => this.renderItem(item, index)}
+                    renderItem={ ({item, index}) => this.renderItem(item)}
+                    keyExtractor= { (item, index) => item.id } //para asignar una key con un id único para cada elemento
+                    extraData= { this.state} //To tell the flatlist to update itself when the state changes
                 />
             </View>
         )
     }
 }
+
+const styles = StyleSheet.create({
+    cell: {
+        height: 200,
+        marginVertical: 10
+    },
+    title : {
+        fontSize:20,
+        textAlign: 'center',
+        marginVertical: 20
+    }
+})
