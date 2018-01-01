@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 import { AsyncCalls, Colors } from '../../commons'
+import {fetch} from '../../webservices/Webservices'
+import HousesCell from './HousesCell'
 
 export default class HousesList extends Component {
 
@@ -13,46 +15,29 @@ export default class HousesList extends Component {
         }
     }
 
-    componentDidMount() {
-
-        AsyncCalls.fetchHousesList()
-        .then( (response) => {  //Si no uso arrow function y uso un function normal, pierdo el contexto y no puedo usar el this.
-            console.log("axios get response: ", response);
-            const list = response.data && response.data.records ? response.data.records : []
-            this.setState( {list }) //mismo que ({list : list})
+    componentWillMount() {
+        //Normalmente llamamos al webservice en el componentWillmount()
+        fetch('/casas').then( response => {
+            console.log("Fetch response: ", response)
+            this.setState({ list: response.records})
+        }).catch( error => {
+            console.log("Error: ", error)
         })
-        .catch( (error) => {
-            console.log("axios get error: ", error);
-        });
     }
 
-    isCellSelected(item) {
-       
-        if ( this.state.selected && this.state.selected.id == item.id ) {
-            return true
-        } else {
-            return false
-        }
+    onSelect(house) {
+        
+        this.setState( { selected: house } )
     }
 
     renderItem(item) {
-
-        const isSelected = this.isCellSelected(item)
-        const cellStyle = isSelected ? {backgroundColor: Colors.red} : { backgroundColor: 'gray'}
-        const titleStyle = isSelected ? { color: 'white'} : { color: 'black'}
-        const buttonTitleColor = isSelected ? 'white' : 'black'
-
+        
         return (
-           // <View style={{height: 200, backgroundColor: 'red', marginVertical: 10}}> //Puedo usar inline o con la const styles declarada abajo
-           <View style = {[styles.cell, cellStyle]}>
-                <Text style={titleStyle}> {item.nombre} </Text>
 
-                <Button
-                    title={'Select House'}
-                    onPress={() => this.setState({ selected: item})}
-                    color= {buttonTitleColor}
-                />
-            </View>
+            <HousesCell
+                item={item}
+                onSelect={ (house) => this.onSelect(house) } //onSelect es como un delegate que se le pasa para que pueda llamar la cell cuando es clickeada
+            />
         )
     }
 
@@ -61,13 +46,13 @@ export default class HousesList extends Component {
         const nombre = this.state.selected ? this.state.selected.nombre : ''
 
         return (
-            <View>
-                <Text style={styles.title}> {"Selected House: " + nombre} </Text>
+            <View style= {styles.container} >
                 <FlatList
                     data={this.state.list} //Pide array de data
                     renderItem={ ({item, index}) => this.renderItem(item)}
                     keyExtractor= { (item, index) => item.id } //para asignar una key con un id único para cada elemento
                     extraData= { this.state} //To tell the flatlist to update itself when the state changes
+                    numColumns={2}
                 />
             </View>
         )
@@ -75,13 +60,10 @@ export default class HousesList extends Component {
 }
 
 const styles = StyleSheet.create({
-    cell: {
-        height: 200,
-        marginVertical: 10
+
+    container: {
+        flex: 1,
+        backgroundColor: 'rgb(42,42,42)',
+        paddingVertical: 20
     },
-    title : {
-        fontSize:20,
-        textAlign: 'center',
-        marginVertical: 20
-    }
 })
