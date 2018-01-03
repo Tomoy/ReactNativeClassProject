@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Button, StyleSheet, ActivityIndicator } from 'react-native';
 import { AsyncCalls, Colors } from '../../commons'
 import HousesCell from './HousesCell'
 
@@ -15,7 +15,7 @@ class HousesList extends Component {
     }
 
     onSelect(house) {
-        
+        this.props.updateSelected(house)
     }
 
     renderItem(item) {
@@ -29,13 +29,33 @@ class HousesList extends Component {
         )
     }
 
+    renderHeader() {
+
+        return <ActivityIndicator animating={this.props.isFetching} size = "large" color="white" />
+        /*if(this.props.isFetching) {
+            
+            return (
+
+                <View>
+                    <ActivityIndicator size = "large" color="white" />
+                </View>
+            )
+        } else {
+            return null
+        }*/
+    }
+
     render () {
-        console.log("props: ", this.props)
-        
+        console.log("is fetching: ", this.props.isFetching)
+        const houseSelected = this.props.item && this.props.item.nombre ? this.props.item.nombre : "None"
+
         return (
             <View style= {styles.container} >
+
+                <Text> {"House selected: " + houseSelected} </Text>
                 <FlatList
                     data={this.props.list} //Pide array de data
+                    ListHeaderComponent= {this.renderHeader()}
                     renderItem={ ({item, index}) => this.renderItem(item)}
                     keyExtractor= { (item, index) => item.id } //para asignar una key con un id único para cada elemento
                     extraData= { this.state} //To tell the flatlist to update itself when the state changes
@@ -46,11 +66,14 @@ class HousesList extends Component {
     }
 }
 
+//Aca es donde venimos una vez que el estado es actualizado y queda accesible en toda la vista desde this.props
 const mapStateToProps = (state) => {
     
     console.log("state: ", state)
     return {
-        list: state.houses.list        
+        list: state.houses.list,
+        item: state.houses.item,
+        isFetching: state.houses.isFetching       
     }
 }
 
@@ -60,6 +83,10 @@ const mapDispatchToProps = (dispatch, props) => {
 
         fetchHousesList: () => {
             dispatch(HouseActions.fetchHousesList())
+        },
+
+        updateSelected: (house) => {
+            dispatch(HouseActions.updateHouseSelected(house))
         }
     }
 }

@@ -11,6 +11,7 @@ export default function reducer(state = initialState, action = {}) {
     console.log("Llega a switch con action type: ", action.type)    
     console.log("Llega a switch con action value: ", action.value)    
     
+    console.log('reducer action con type: ', action.type)
     switch (action.type) {
         
         case types.HOUSES_UPDATE_LIST: 
@@ -20,6 +21,20 @@ export default function reducer(state = initialState, action = {}) {
                 ...state,
                 list: action.value
             };
+
+        case types.HOUSES_UPDATE_SELECTED: 
+            
+            return {
+                ...state,
+                item: action.value
+            }
+
+        case types.HOUSES_SET_FETCHING:
+            
+            return {
+                ...state,
+                isFetching: action.value
+            }
 
         default:
             return state;
