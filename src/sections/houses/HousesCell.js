@@ -3,7 +3,7 @@ import { TouchableOpacity, Image, StyleSheet, Dimensions, Platform } from 'react
 
 export default class HousesCell extends Component {
 
-    //Se ponen las propiedades que esperamos del componente padr por defecto, por si no las llegan a pasar, para que no pinche la app.
+    //Se ponen las propiedades que esperamos del componente padre por defecto, por si no las llegan a pasar, para que no pinche la app.
     static defaultProps = {
         onSelect: () => {}, //Funcion
         item:     {}  //Objeto
@@ -11,7 +11,7 @@ export default class HousesCell extends Component {
 
     render () {
 
-        const { item, onSelect } = this.props
+        const { item, onSelect } = this.props //Mismo que hacer const item = this.props.item ...
         
         const image = item.image_dir ? { uri: item.image_dir } : null //o require('path_a_la_img_default')
 

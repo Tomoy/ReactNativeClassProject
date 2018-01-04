@@ -8,8 +8,11 @@ import React, { Component } from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { Actions, Scene, Router } from 'react-native-router-flux';
 
-import HousesList from './sections/houses/HousesList';
 import * as WebServices from './webservices/Webservices'
+import { Colors } from './commons'
+
+import HousesList from './sections/houses/HousesList';
+import CharactersList from './sections/characters/CharactersList';
 
 import { createStore, applyMiddleware, combineReducers } from 'redux'
 import { Provider, connect } from 'react-redux'
@@ -31,6 +34,8 @@ export default class App extends Component {
     
   render() {
 
+    console.disableYellowBox = true
+    
     return (
         <Provider store={store}>
             <Router>
@@ -42,6 +47,13 @@ export default class App extends Component {
                     hideNavBar
                 />
 
+                <Scene 
+                    key={ 'CharactersList' }
+                    component={ CharactersList }
+                    navigationBarStyle= {styles.navBar}
+                    navBarButtonColor= {'white'}
+                />
+
                 </Scene>
             </Router>
         </Provider>
@@ -51,4 +63,7 @@ export default class App extends Component {
 
 const styles = StyleSheet.create({
 
+    navBar: {
+        backgroundColor: Colors.navBar
+    }
 });

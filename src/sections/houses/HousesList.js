@@ -3,6 +3,9 @@ import { View, Text, FlatList, Button, StyleSheet, ActivityIndicator } from 'rea
 import { AsyncCalls, Colors } from '../../commons'
 import HousesCell from './HousesCell'
 
+import { Actions } from 'react-native-router-flux'
+
+//Redux
 import { connect } from 'react-redux'
 import * as HouseActions from '../../redux/actions/houses'
 
@@ -87,6 +90,7 @@ const mapDispatchToProps = (dispatch, props) => {
 
         updateSelected: (house) => {
             dispatch(HouseActions.updateHouseSelected(house))
+            Actions.CharactersList( {title: house.nombre} )
         }
     }
 }
@@ -97,7 +101,8 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: 'rgb(42,42,42)',
-        paddingVertical: 20
+        backgroundColor: Colors.housesBackground,
+        paddingVertical: 20,
+        paddingTop: 60
     },
 })
